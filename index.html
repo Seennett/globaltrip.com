@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLOBALTRIP × inCruises — 크루즈 구독 멤버십</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #040c18;
+    --deep: #071222;
+    --ocean: #082040;
+    --teal: #00d4b8;
+    --coral: #ff5040;
+    --gold: #f5c030;
+    --white: #eef4ff;
+    --muted: #6a88aa;
+    --card-bg: rgba(8,32,64,0.7);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Noto Sans KR', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor { width:10px; height:10px; background:var(--teal); border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform .1s; mix-blend-mode:difference; }
+  .cursor-ring { width:32px; height:32px; border:1px solid rgba(0,212,184,.5); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:left .07s,top .07s; }
+
+  /* ─── NAV ─── */
+  nav {
+    position:fixed; top:0; width:100%; z-index:200;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 60px;
+    background:rgba(4,12,24,.85);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(0,212,184,.08);
+  }
+  .logo { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:5px; }
+  .logo em { color:var(--teal); font-style:normal; }
+  nav ul { list-style:none; display:flex; gap:36px; }
+  nav a { font-family:'Syne',sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .3s; }
+  nav a:hover { color:var(--teal); }
+  .nav-btn { background:var(--teal)!important; color:var(--navy)!important; padding:9px 22px; border-radius:3px; font-weight:700!important; transition:all .3s!important; }
+  .nav-btn:hover { background:#00f0d0!important; transform:translateY(-1px); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height:100vh;
+    display:grid; grid-template-columns:1fr 1fr;
+    align-items:center;
+    padding:120px 60px 80px;
+    position:relative; overflow:hidden;
+    gap:60px;
+  }
+
+  /* animated particle bg */
+  .particles { position:absolute; inset:0; overflow:hidden; z-index:2; }
+  .particles span {
+    position:absolute; width:2px; height:2px; background:var(--teal);
+    border-radius:50%; opacity:0;
+    animation:drift linear infinite;
+  }
+  @keyframes drift {
+    0%   { transform:translateY(100vh) translateX(0); opacity:0; }
+    10%  { opacity:.6; }
+    90%  { opacity:.4; }
+    100% { transform:translateY(-10vh) translateX(var(--dx,30px)); opacity:0; }
+  }
+
+  .hero-bg-grad {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(to right, rgba(4,12,24,.82) 0%, rgba(4,12,24,.45) 55%, rgba(4,12,24,.15) 100%),
+      linear-gradient(to top, rgba(4,12,24,.7) 0%, transparent 35%);
+    z-index:1;
+  }
+  .hero-bg-img {
+    position:absolute; inset:0;
+    background: url('https://images.unsplash.com/photo-1548574505-5e239809ee19?w=1800&q=85') center center / cover no-repeat;
+    animation: slowZoom 20s ease-in-out infinite alternate;
+    z-index:0;
+  }
+  .hero-bg-img::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(0,212,184,.04) 0%, transparent 60%);
+  }
+  @keyframes slowZoom {
+    0%   { transform: scale(1)    translateX(0px); }
+    100% { transform: scale(1.08) translateX(-30px); }
+  }
+
+  /* wave SVG overlay */
+  .wave-overlay { position:absolute; bottom:0; left:0; width:100%; opacity:.12; }
+
+  .hero-left { position:relative; z-index:3; }
+  .hero-right { position:relative; z-index:3; opacity:0; animation:fadeIn 1s forwards .6s; }
+
+  .eyebrow {
+    display:flex; align-items:center; gap:12px;
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:4px; text-transform:uppercase; color:var(--teal);
+    margin-bottom:24px;
+    opacity:0; animation:fadeUp .7s forwards .3s;
+  }
+  .eyebrow-line { width:28px; height:1px; background:var(--teal); }
+
+  h1 {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(64px,7.5vw,110px);
+    line-height:.92; letter-spacing:2px;
+    margin-bottom:28px;
+    opacity:0; animation:fadeUp .7s forwards .5s;
+  }
+  h1 .t { color:var(--teal); }
+  h1 .o {
+    -webkit-text-stroke:1px rgba(238,244,255,.3);
+    color:transparent;
+  }
+
+  .hero-desc {
+    font-size:15px; line-height:1.9; color:var(--muted);
+    max-width:440px; margin-bottom:40px;
+    opacity:0; animation:fadeUp .7s forwards .7s;
+  }
+
+  .hero-stats {
+    display:flex; gap:36px; margin-bottom:44px;
+    opacity:0; animation:fadeUp .7s forwards .8s;
+  }
+  .hs { display:flex; flex-direction:column; gap:2px; }
+  .hs-num { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--teal); }
+  .hs-label { font-size:11px; color:var(--muted); letter-spacing:1px; }
+
+  .hero-btns {
+    display:flex; gap:16px; align-items:center;
+    opacity:0; animation:fadeUp .7s forwards .95s;
+  }
+  .btn-p {
+    background:var(--teal); color:var(--navy);
+    padding:15px 34px; border-radius:3px;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:12px;
+    letter-spacing:2px; text-transform:uppercase;
+    text-decoration:none; transition:all .3s;
+    display:inline-block;
+  }
+  .btn-p:hover { background:#00f0d0; transform:translateY(-2px); box-shadow:0 14px 40px rgba(0,212,184,.28); }
+  .btn-s {
+    color:var(--white); font-family:'Syne',sans-serif; font-size:12px;
+    letter-spacing:2px; text-transform:uppercase; text-decoration:none;
+    display:flex; align-items:center; gap:10px; transition:color .3s;
+  }
+  .btn-s:hover { color:var(--teal); }
+  .play-btn {
+    width:40px; height:40px; border:1px solid rgba(255,255,255,.2);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+  }
+
+  /* Hero right handled above */
+  .cruise-card {
+    background:linear-gradient(145deg, rgba(8,32,64,.95), rgba(5,15,35,.97));
+    border:1px solid rgba(0,212,184,.15);
+    border-radius:20px; overflow:hidden;
+    box-shadow:0 40px 100px rgba(0,0,0,.6);
+  }
+  .card-img {
+    height:260px;
+    background:linear-gradient(160deg, #0a3568 0%, #0d5090 40%, #00a898 100%);
+    display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+    font-size:72px;
+  }
+  .card-img::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(5,15,35,.9) 0%, transparent 50%);
+  }
+  .ship { position:relative; z-index:2; animation:float 5s ease-in-out infinite; }
+  .card-glow {
+    position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+    width:200px; height:80px;
+    background:rgba(0,212,184,.25);
+    filter:blur(30px); border-radius:50%;
+  }
+  .card-body { padding:26px 28px; }
+  .card-tag {
+    display:inline-block; background:rgba(0,212,184,.1);
+    color:var(--teal); font-size:10px; font-weight:600;
+    letter-spacing:2px; text-transform:uppercase;
+    padding:5px 12px; border-radius:20px; margin-bottom:14px;
+    border:1px solid rgba(0,212,184,.2);
+  }
+  .card-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; margin-bottom:6px; }
+  .card-sub { font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+  .card-metrics { display:flex; gap:0; }
+  .cm {
+    flex:1; display:flex; flex-direction:column; gap:3px;
+    padding:14px 0;
+    border-right:1px solid rgba(255,255,255,.06);
+  }
+  .cm:last-child { border-right:none; padding-left:20px; }
+  .cm:not(:first-child) { padding-left:20px; }
+  .cm-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--teal); }
+  .cm-label { font-size:10px; color:var(--muted); letter-spacing:1px; }
+
+  /* floating badges */
+  .fbadge {
+    position:absolute;
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:700;
+    padding:8px 16px; border-radius:20px;
+    animation:floatBadge 3.5s ease-in-out infinite;
+    letter-spacing:.5px;
+  }
+  .fb1 { top:-14px; right:24px; background:var(--coral); color:#fff; }
+  .fb2 { bottom:110px; left:-18px; background:var(--gold); color:var(--navy); animation-delay:1.8s; }
+
+  /* ─── SECTION COMMONS ─── */
+  section { padding:110px 60px; }
+  .section-tag {
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:5px; text-transform:uppercase; color:var(--teal);
+    margin-bottom:14px;
+  }
+  .section-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(44px,5.5vw,72px); line-height:1;
+    letter-spacing:2px; margin-bottom:16px;
+  }
+  .section-title .accent { color:var(--teal); }
+  .section-sub { font-size:15px; color:var(--muted); line-height:1.8; max-width:520px; }
+
+  /* ─── HOW IT WORKS (Services) ─── */
+  #services { background:var(--deep); }
+
+  .steps-header { text-align:center; margin-bottom:72px; }
+  .steps-header .section-sub { margin:0 auto; }
+
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; }
+  .step {
+    background:var(--card-bg);
+    border:1px solid rgba(0,212,184,.08);
+    padding:40px 32px;
+    position:relative;
+    transition:border-color .3s, transform .3s;
+  }
+  .step:hover { border-color:rgba(0,212,184,.3); transform:translateY(-4px); }
+  .step-num {
+    font-family:'Bebas Neue',sans-serif; font-size:64px;
+    color:rgba(0,212,184,.08); line-height:1;
+    position:absolute; top:20px; right:24px;
+  }
+  .step-icon {
+    width:52px; height:52px;
+    background:rgba(0,212,184,.1); border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; margin-bottom:24px;
+    border:1px solid rgba(0,212,184,.15);
+  }
+  .step h3 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; margin-bottom:12px; }
+  .step p { font-size:13px; line-height:1.8; color:var(--muted); }
+  .step-arrow {
+    position:absolute; right:-16px; top:50%;
+    transform:translateY(-50%);
+    color:var(--teal); font-size:18px; z-index:2;
+    display:flex; align-items:center;
+  }
+  .step:last-child .step-arrow { display:none; }
+
+  /* ─── PLANS (Portfolio) ─── */
+  #portfolio { position:relative; }
+  #portfolio::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(0,212,184,.3), transparent);
+  }
+
+  .plans-header { text-align:center; margin-bottom:72px; }
+  .plans-header .section-sub { margin:0 auto; }
+
+  .plans { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:960px; margin:0 auto; }
+  .plan {
+    background:var(--card-bg);
+    border:1px solid rgba(0,212,184,.1);
+    border-radius:16px; padding:40px 36px;
+    position:relative; overflow:hidden;
+    transition:all .35s;
+  }
+  .plan::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:rgba(0,212,184,.2);
+    transition:background .3s;
+  }
+  .plan:hover { border-color:rgba(0,212,184,.3); transform:translateY(-6px); box-shadow:0 30px 80px rgba(0,0,0,.4); }
+  .plan:hover::before { background:var(--teal); }
+  .plan.featured {
+    border-color:var(--teal); background:linear-gradient(145deg, rgba(0,212,184,.08), rgba(8,32,64,.9));
+    transform:scale(1.04);
+  }
+  .plan.featured::before { background:var(--teal); }
+  .plan.featured:hover { transform:scale(1.04) translateY(-4px); }
+  .featured-badge {
+    position:absolute; top:18px; right:18px;
+    background:var(--teal); color:var(--navy);
+    font-family:'Syne',sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:1px; text-transform:uppercase;
+    padding:4px 12px; border-radius:20px;
+  }
+  .plan-name { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+  .plan-price {
+    font-family:'Bebas Neue',sans-serif; font-size:56px; letter-spacing:2px;
+    line-height:1; margin-bottom:6px;
+  }
+  .plan-price span { font-size:22px; }
+  .plan-period { font-size:12px; color:var(--muted); margin-bottom:28px; }
+  .plan-divider { height:1px; background:rgba(255,255,255,.06); margin-bottom:28px; }
+  .plan ul { list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:36px; }
+  .plan li { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:10px; }
+  .plan li::before { content:'✓'; color:var(--teal); font-weight:700; flex-shrink:0; }
+  .plan li.dim::before { content:'—'; color:rgba(255,255,255,.2); }
+  .plan li.dim { color:rgba(255,255,255,.2); }
+  .plan-btn {
+    display:block; text-align:center;
+    padding:14px; border-radius:8px;
+    font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+    letter-spacing:2px; text-transform:uppercase; text-decoration:none;
+    border:1px solid rgba(0,212,184,.3); color:var(--teal);
+    transition:all .3s;
+  }
+  .plan-btn:hover { background:rgba(0,212,184,.1); }
+  .plan.featured .plan-btn { background:var(--teal); color:var(--navy); border-color:var(--teal); }
+  .plan.featured .plan-btn:hover { background:#00f0d0; }
+
+  /* points note */
+  .points-note {
+    text-align:center; margin-top:40px;
+    font-size:13px; color:var(--muted);
+    background:rgba(0,212,184,.05); border:1px solid rgba(0,212,184,.12);
+    padding:16px 32px; border-radius:8px; max-width:640px; margin:40px auto 0;
+    line-height:1.8;
+  }
+  .points-note strong { color:var(--teal); }
+
+  /* ─── CRUISES SHOWCASE ─── */
+  #showcase { background:var(--deep); }
+  .showcase-header { margin-bottom:56px; }
+
+  .cruise-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .cruise-item {
+    border-radius:12px; overflow:hidden;
+    border:1px solid rgba(0,212,184,.08);
+    transition:all .3s; cursor:pointer;
+    position:relative;
+  }
+  .cruise-item:hover { border-color:rgba(0,212,184,.3); transform:translateY(-4px); }
+  .ci-img {
+    height:200px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:48px; position:relative; overflow:hidden;
+  }
+  .ci-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+  .cruise-item:hover .ci-img img { transform:scale(1.06); }
+  .ci-img::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(5,15,35,.85) 0%, transparent 60%);
+    z-index:1;
+  }
+  .ci-body { padding:20px; background:var(--card-bg); }
+  .ci-region { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--teal); margin-bottom:6px; }
+  .ci-name { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; }
+  .ci-route { font-size:12px; color:var(--muted); margin-bottom:10px; }
+  .ci-price { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:var(--teal); }
+  .ci-price span { font-size:11px; color:var(--muted); font-weight:400; }
+  .ci-nights {
+    position:absolute; top:14px; right:14px; z-index:2;
+    background:rgba(4,12,24,.85); color:var(--white);
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:600;
+    padding:4px 10px; border-radius:12px;
+    border:1px solid rgba(0,212,184,.2);
+  }
+
+  /* ─── CONTACT ─── */
+  #contact { position:relative; }
+  #contact::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(0,212,184,.3), transparent);
+  }
+
+  .contact-inner {
+    display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start;
+  }
+  .contact-left .section-title { margin-bottom:20px; }
+  .contact-left p { font-size:15px; color:var(--muted); line-height:1.9; margin-bottom:36px; }
+
+  .contact-infos { display:flex; flex-direction:column; gap:16px; }
+  .ci2 {
+    display:flex; align-items:center; gap:16px;
+    padding:16px 20px;
+    background:var(--card-bg); border-radius:10px;
+    border:1px solid rgba(0,212,184,.08);
+  }
+  .ci2-icon { font-size:20px; }
+  .ci2-text { display:flex; flex-direction:column; gap:2px; }
+  .ci2-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .ci2-val { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; }
+
+  .contact-form { display:flex; flex-direction:column; gap:16px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:8px; }
+  .form-group label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background:rgba(8,32,64,.6); border:1px solid rgba(0,212,184,.12);
+    border-radius:8px; padding:14px 16px;
+    color:var(--white); font-family:'Noto Sans KR',sans-serif; font-size:14px;
+    outline:none; transition:border-color .3s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color:var(--teal); }
+  .form-group select option { background:var(--deep); }
+  .form-group textarea { resize:vertical; min-height:110px; }
+  .form-submit {
+    background:var(--teal); color:var(--navy);
+    padding:16px; border:none; border-radius:8px;
+    font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+    letter-spacing:2px; text-transform:uppercase;
+    cursor:pointer; transition:all .3s; margin-top:4px;
+  }
+  .form-submit:hover { background:#00f0d0; box-shadow:0 10px 30px rgba(0,212,184,.3); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background:var(--deep);
+    border-top:1px solid rgba(0,212,184,.08);
+    padding:48px 60px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:4px; }
+  .footer-logo em { color:var(--teal); font-style:normal; }
+  footer p { font-size:12px; color:var(--muted); }
+  .footer-links { display:flex; gap:24px; }
+  .footer-links a { font-size:11px; letter-spacing:1px; color:var(--muted); text-decoration:none; transition:color .3s; }
+  .footer-links a:hover { color:var(--teal); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(28px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; }
+    to   { opacity:1; }
+  }
+  @keyframes float {
+    0%,100% { transform:translateY(0px); }
+    50%      { transform:translateY(-14px); }
+  }
+  @keyframes floatBadge {
+    0%,100% { transform:translateY(0) rotate(-2deg); }
+    50%      { transform:translateY(-8px) rotate(1deg); }
+  }
+  @keyframes scrollLine {
+    0%   { transform:scaleY(0); transform-origin:top; }
+    50%  { transform:scaleY(1); transform-origin:top; }
+    51%  { transform:scaleY(1); transform-origin:bottom; }
+    100% { transform:scaleY(0); transform-origin:bottom; }
+  }
+
+  .scroll-hint {
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    font-family:'Syne',sans-serif; font-size:9px; letter-spacing:3px;
+    text-transform:uppercase; color:var(--muted);
+    opacity:0; animation:fadeIn .8s forwards 1.6s;
+  }
+  .scroll-line {
+    width:1px; height:44px;
+    background:linear-gradient(to bottom, var(--teal), transparent);
+    animation:scrollLine 1.6s ease-in-out infinite;
+  }
+
+  /* ─── BILINGUAL ─── */
+  .en { display:block; font-size:0.72em; color:var(--muted); letter-spacing:1px; margin-top:2px; font-family:'Syne',sans-serif; font-weight:400; text-transform:none; }
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s, transform .7s; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* responsive basics */
+  @media(max-width:900px) {
+    nav { padding:18px 24px; }
+    nav ul { display:none; }
+    #hero { grid-template-columns:1fr; padding:100px 24px 60px; }
+    .hero-right { display:none; }
+    section { padding:80px 24px; }
+    .steps { grid-template-columns:1fr 1fr; }
+    .plans { grid-template-columns:1fr; }
+    .cruise-grid { grid-template-columns:1fr 1fr; }
+    .contact-inner { grid-template-columns:1fr; gap:48px; }
+    footer { flex-direction:column; gap:20px; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo"><em>GLOBAL</em>TRIP × inCruises</div>
+  <ul>
+    <li><a href="#services">멤버십 <span class="en">Membership</span></a></li>
+    <li><a href="#portfolio">요금제 <span class="en">Plans</span></a></li>
+    <li><a href="#showcase">크루즈 <span class="en">Cruises</span></a></li>
+    <li><a href="https://globaltrip.incruises.com/signup" target="_blank" class="nav-btn">구독 신청 <span class="en" style="color:var(--navy)">Sign Up</span></a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-img"></div>
+  <div class="hero-bg-grad"></div>
+
+  <!-- particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- wave -->
+  <svg class="wave-overlay" viewBox="0 0 1440 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,100 C240,160 480,40 720,100 C960,160 1200,40 1440,100 L1440,200 L0,200 Z" fill="rgba(0,212,184,1)"/>
+  </svg>
+
+  <div class="hero-left">
+    <div class="eyebrow"><span class="eyebrow-line"></span>세계 1위 크루즈 구독 클럽 <span class="en" style="display:inline;margin-left:6px;">World's #1 Cruise Subscription Club</span></div>
+    <h1>
+      바다 위의<br>
+      <span class="t">프리미엄</span><br>
+      <span class="o">라이프스타일</span>
+    </h1>
+    <p class="hero-desc">
+      월 구독으로 전 세계 크루즈를 최대 50~100% 할인된 가격에.<br>
+      190개국 100만 회원이 선택한 <strong>inCruises</strong> 멤버십을<br>
+      GLOBALTRIP과 함께 시작하세요.
+    </p>
+    <div class="hero-stats">
+      <div class="hs"><span class="hs-num">190+</span><span class="hs-label">서비스 국가 <span class="en">Countries</span></span></div>
+      <div class="hs"><span class="hs-num">100만+</span><span class="hs-label">글로벌 회원 <span class="en">Members</span></span></div>
+      <div class="hs"><span class="hs-num">50%↑</span><span class="hs-label">구매력 2배 <span class="en">2x Savings</span></span></div>
+    </div>
+    <div class="hero-btns">
+      <a href="https://globaltrip.incruises.com/signup" target="_blank" class="btn-p">멤버십 시작하기 <span class="en" style="color:var(--navy)">Start Membership</span></a>
+      <a href="#services" class="btn-s"><span class="play-btn">▶</span>예약 방식 <span class="en">How to Book</span></a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div style="position:relative;">
+      <span class="fbadge fb1">🔥 HOT 멤버십</span>
+      <span class="fbadge fb2">⭐ 리워드 2배</span>
+      <div class="cruise-card">
+        <div class="card-img">
+          <span class="ship">🚢</span>
+          <div class="card-glow"></div>
+        </div>
+        <div class="card-body">
+          <span class="card-tag">멤버 전용 특가</span>
+          <div class="card-title">지중해 크루즈 7박 8일</div>
+          <div class="card-sub">바르셀로나 → 로마 → 산토리니</div>
+          <div class="card-metrics">
+            <div class="cm">
+              <span class="cm-val">50%</span>
+              <span class="cm-label">리워드 할인 <span class="en">Reward</span></span>
+            </div>
+            <div class="cm">
+              <span class="cm-val">7박</span>
+              <span class="cm-label">크루즈 일정 <span class="en">7 Nights</span></span>
+            </div>
+            <div class="cm">
+              <span class="cm-val">INsider</span>
+              <span class="cm-label">멤버 전용가 <span class="en">Members Only</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="services">
+  <div class="steps-header reveal">
+    <div class="section-tag">How It Works</div>
+    <h2 class="section-title">어떻게 <span class="accent">예약</span>하나요? <span class="en" style="font-size:.5em;vertical-align:middle;">How to Book</span></h2>
+    <p class="section-sub">매월 구독료를 납부하면 리워드 포인트가 2배로 적립되고, 그 포인트로 크루즈 비용을 최대 100%까지 절감할 수 있습니다.<br><span class="en">Monthly subscription doubles your reward points, reducing cruise costs by up to 100%.</span></p>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-icon">📋</div>
+      <h3>멤버십 가입 <span class="en">Join</span></h3>
+      <p>Starter · Classic · Premium 중 원하는 플랜을 선택하고 월 구독을 시작합니다.<br><span class="en">Choose your plan and start your monthly subscription.</span></p>
+      <div class="step-arrow">→</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-icon">💎</div>
+      <h3>리워드 포인트 적립 <span class="en">Earn Points</span></h3>
+      <p>매월 납부한 금액의 2배 리워드 포인트가 즉시 계정에 적립됩니다. 포인트는 만료 없음.<br><span class="en">Earn 2x reward points monthly. Points never expire.</span></p>
+      <div class="step-arrow">→</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-icon">🛳️</div>
+      <h3>크루즈 예약 <span class="en">Book</span></h3>
+      <p>회원 전용 플랫폼에서 전 세계 수천 개 크루즈·호텔·리조트를 INsider 가격으로 예약합니다.<br><span class="en">Book cruises, hotels & resorts at exclusive INsider prices.</span></p>
+      <div class="step-arrow">→</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">04</div>
+      <div class="step-icon">✈️</div>
+      <h3>출발 & 절약 <span class="en">Sail & Save</span></h3>
+      <p>적립된 포인트로 크루즈 비용을 50~100% 절감. 구매력이 2배가 되는 스마트한 여행!<br><span class="en">Use points to save 50–100% on cruise costs. Smart travel!</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section id="portfolio">
+  <div class="plans-header reveal">
+    <div class="section-tag">Membership Plans</div>
+    <h2 class="section-title">나에게 맞는 <span class="accent">플랜</span> 선택 <span class="en" style="font-size:.5em;vertical-align:middle;">Choose Your Plan</span></h2>
+    <p class="section-sub">모든 플랜에 INsider 가격(즉시 17% 할인)과 리워드 포인트 2배 적립이 포함됩니다.<br><span class="en">All plans include instant 17% INsider pricing &amp; 2x reward points.</span></p>
+  </div>
+  <div class="plans">
+    <div class="plan reveal">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price"><span>$</span>50<span style="font-size:18px">/mo</span></div>
+      <div class="plan-period">+ 초기 가입비 별도 <span class="en">+ Enrollment fee</span></div>
+      <div class="plan-divider"></div>
+      <ul>
+        <li>INsider 즉시 17% 할인 <span class="en">Instant 17% off</span></li>
+        <li>리워드 포인트 2배 적립 <span class="en">2x reward points</span></li>
+        <li>크루즈·호텔·리조트 예약 <span class="en">Cruise/Hotel/Resort</span></li>
+        <li>기본 멤버 전용 플랫폼 <span class="en">Member platform</span></li>
+        <li class="dim">Premium 전용 여행 패키지</li>
+        <li class="dim">파트너 수익 기회</li>
+      </ul>
+      <a href="https://globaltrip.incruises.com/signup" target="_blank" class="plan-btn">시작하기 <span class="en">Get Started</span></a>
+    </div>
+    <div class="plan featured reveal">
+      <span class="featured-badge">POPULAR</span>
+      <div class="plan-name">Classic</div>
+      <div class="plan-price"><span>$</span>100<span style="font-size:18px">/mo</span></div>
+      <div class="plan-period">월 200 리워드 포인트 적립 <span class="en">200 Reward Points/mo</span></div>
+      <div class="plan-divider"></div>
+      <ul>
+        <li>INsider 즉시 17% 할인 <span class="en">Instant 17% off</span></li>
+        <li>월 $100 납부 → 200RP 적립 <span class="en">$100/mo → 200RP</span></li>
+        <li>포인트로 크루즈 50~100% 할인 <span class="en">50–100% off cruises</span></li>
+        <li>크루즈·호텔·리조트 전체 이용 <span class="en">All travel types</span></li>
+        <li>파트너 수익 프로그램 참여 가능 <span class="en">Partner earnings</span></li>
+        <li>포인트 만료 없음 <span class="en">Points never expire</span></li>
+      </ul>
+      <a href="https://globaltrip.incruises.com/signup" target="_blank" class="plan-btn">시작하기 <span class="en" style="color:var(--navy)">Get Started</span></a>
+    </div>
+    <div class="plan reveal">
+      <div class="plan-name">Premium</div>
+      <div class="plan-price"><span>$</span>250<span style="font-size:18px">/mo</span></div>
+      <div class="plan-period">빠른 포인트 적립 + 럭셔리 <span class="en">Fast Points + Luxury</span></div>
+      <div class="plan-divider"></div>
+      <ul>
+        <li>INsider 즉시 17% 할인 <span class="en">Instant 17% off</span></li>
+        <li>더 빠른 리워드 포인트 적립 <span class="en">Faster point earning</span></li>
+        <li>럭셔리 여행 패키지 무제한 접근 <span class="en">Unlimited luxury access</span></li>
+        <li>크루즈·호텔·리조트 전체 이용 <span class="en">All travel types</span></li>
+        <li>파트너 수익 프로그램 참여 가능 <span class="en">Partner earnings</span></li>
+        <li>Elite Travel Advantage 혜택 <span class="en">Elite Travel Advantage</span></li>
+      </ul>
+      <a href="https://globaltrip.incruises.com/signup" target="_blank" class="plan-btn">시작하기 <span class="en">Get Started</span></a>
+    </div>
+  </div>
+  <p class="points-note reveal">
+    💡 <strong>리워드 포인트 예시 / Reward Point Example</strong> — Classic 플랜으로 12개월 납부 시 2,400RP 적립.<br>
+    $2,400 상당의 크루즈 비용을 포인트로 충당, 실제 지출은 절반 이하!<br>
+    <span class="en">12 months on Classic = 2,400RP earned. Cover $2,400 in cruise costs — pay less than half!</span>
+  </p>
+</section>
+
+<!-- VIDEO SECTION -->
+<section id="video" style="background:var(--deep); padding:100px 60px;">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="reveal" style="text-align:center; margin-bottom:60px;">
+      <div class="section-tag">소개 영상 · Introduction Video</div>
+      <h2 class="section-title">inCruises <span class="accent">멤버십</span>이란?</h2>
+      <p style="font-size:15px; color:var(--muted); line-height:1.8;">직접 영상으로 확인해 보세요. <span class="en">Click to watch.</span></p>
+    </div>
+
+    <style>
+      .video-wrap { position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:14px; border:1px solid rgba(0,212,184,.2); box-shadow:0 30px 80px rgba(0,0,0,.5); }
+      .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+      .shorts-wrap { position:relative; width:100%; padding-bottom:177.78%; height:0; overflow:hidden; border-radius:14px; border:1px solid rgba(0,212,184,.2); box-shadow:0 20px 50px rgba(0,0,0,.5); }
+      .shorts-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+      @media(max-width:700px){
+        .video-grid { grid-template-columns:1fr !important; }
+        .shorts-wrap { padding-bottom:56.25%; }
+      }
+    </style>
+
+    <div class="video-grid reveal" style="display:grid; grid-template-columns:2fr 1fr; gap:28px; align-items:start;">
+      <!-- 메인 영상 -->
+      <div>
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/WQzyVv2Ccqs?rel=0&playsinline=1"
+            title="inCruises 멤버십 소개"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px; text-align:center;">
+          📺 inCruises 멤버십 소개 영상
+          &nbsp;·&nbsp;
+          <a href="https://youtu.be/WQzyVv2Ccqs" target="_blank" style="color:var(--teal); text-decoration:none;">유튜브에서 보기 →</a>
+        </p>
+      </div>
+      <!-- 쇼츠 -->
+      <div>
+        <div class="shorts-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/KsRAXIpOSo0?rel=0&playsinline=1"
+            title="inCruises 쇼츠"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px; text-align:center;">
+          🎬 Shorts
+          &nbsp;·&nbsp;
+          <a href="https://www.youtube.com/shorts/KsRAXIpOSo0" target="_blank" style="color:var(--teal); text-decoration:none;">유튜브에서 보기 →</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRUISE SHOWCASE -->
+<section id="showcase" style="background:var(--deep);">
+  <div class="showcase-header reveal">
+    <div class="section-tag">Featured Cruises</div>
+    <h2 class="section-title">인기 <span class="accent">크루즈</span> 코스 <span class="en" style="font-size:.5em;vertical-align:middle;">Featured Cruise Routes</span></h2>
+  </div>
+  <div class="cruise-grid">
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a3a6a,#2a6090);">
+        <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?w=600&q=80&auto=format&fit=crop" alt="지중해 크루즈" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">7박 8일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🇪🇸 유럽 · 지중해</div>
+        <div class="ci-name">지중해 클래식</div>
+        <div class="ci-route">바르셀로나 → 마르세유 → 로마 → 산토리니</div>
+        <div class="ci-price">$1,050 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#0a4030,#1a8060);">
+        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&q=80&auto=format&fit=crop" alt="카리브해 크루즈" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">7박 8일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🌴 카리브해</div>
+        <div class="ci-name">카리브 선셋</div>
+        <div class="ci-route">마이애미 → 바하마 → 자메이카 → 케이맨</div>
+        <div class="ci-price">$980 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a1a40,#2a3080);">
+        <img src="https://images.unsplash.com/photo-1464817739973-0128fe77aaa1?w=600&q=80&auto=format&fit=crop" alt="동북아 크루즈" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">4박 5일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🌸 아시아 · 동북아</div>
+        <div class="ci-name">동북아 크루즈</div>
+        <div class="ci-route">부산 → 일본(나가사키·후쿠오카) → 제주</div>
+        <div class="ci-price">$620 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a3050,#0a6080);">
+        <img src="https://images.unsplash.com/photo-1601581975053-7c899da7347e?w=600&q=80&auto=format&fit=crop" alt="북유럽 피오르드" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">14박 15일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🏔️ 북유럽 · 피오르드</div>
+        <div class="ci-name">노르웨이 피오르드</div>
+        <div class="ci-route">코펜하겐 → 베르겐 → 올레순 → 스타방에르</div>
+        <div class="ci-price">$1,680 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a2050,#3a1070);">
+        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80&auto=format&fit=crop" alt="두바이 아라비안" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">10박 11일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🕌 중동 · 아라비안</div>
+        <div class="ci-name">아라비안 나이트</div>
+        <div class="ci-route">두바이 → 아부다비 → 무스카트 → 도하</div>
+        <div class="ci-price">$1,350 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a4020,#2a6040);">
+        <img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=600&q=80&auto=format&fit=crop" alt="알래스카 빙하" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">7박 8일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🏔️ 북미 · 알래스카</div>
+        <div class="ci-name">알래스카 빙하</div>
+        <div class="ci-route">시애틀 → 주노 → 케치칸 → 스캐그웨이</div>
+        <div class="ci-price">$1,350 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#0a3040,#0a7080);">
+        <img src="https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=600&q=80&auto=format&fit=crop" alt="몰디브 인도양" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">5박 6일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🏝️ 인도양 · 몰디브</div>
+        <div class="ci-name">몰디브 오션 드림</div>
+        <div class="ci-route">말레 → 아리환초 → 바아환초 → 라아환초</div>
+        <div class="ci-price">$1,200 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#1a3060,#2a6090);">
+        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=600&q=80&auto=format&fit=crop" alt="아드리아해 크루즈" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">10박 11일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🏛️ 유럽 · 아드리아해</div>
+        <div class="ci-name">아드리아 선셋</div>
+        <div class="ci-route">베니스 → 두브로브니크 → 코토르 → 아테네</div>
+        <div class="ci-price">$1,480 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+    <div class="cruise-item reveal">
+      <div class="ci-img" style="background:linear-gradient(135deg,#0a4040,#1a8060);">
+        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80&auto=format&fit=crop" alt="남태평양 크루즈" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+        <span class="ci-nights">12박 13일</span>
+      </div>
+      <div class="ci-body">
+        <div class="ci-region">🌊 남태평양 · 오세아니아</div>
+        <div class="ci-name">남태평양 파라다이스</div>
+        <div class="ci-route">시드니 → 피지 → 바누아투 → 뉴칼레도니아</div>
+        <div class="ci-price">$1,100 <span>2인 기준 · 항공 별도</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TRAVEL CLUB -->
+<section id="club" style="background:var(--navy); padding:100px 60px;">
+  <div style="max-width:1000px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;">
+    <div class="reveal">
+      <div class="section-tag">크루즈여행클럽 · Travel Club</div>
+      <h2 class="section-title">함께 떠나는<br><span class="accent">크루즈 동호회</span></h2>
+      <p style="font-size:15px; color:var(--muted); line-height:1.9; margin-bottom:32px;">
+        혼자 떠나는 여행도 좋지만, 함께라면 더욱 특별합니다.<br>
+        GLOBALTRIP 크루즈여행클럽은 6년 이상의 역사를 가진 크루즈 전문 여행 동호회입니다.<br>
+        회원들과 함께 전 세계 바다를 누비며 평생 기억에 남는 추억을 만들어 가세요.<br>
+        <span class="en">Join our cruise travel club and sail the world together with fellow members!</span>
+      </p>
+      <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:36px;">
+        <div style="display:flex; align-items:center; gap:12px; color:rgba(238,244,255,.85); font-size:14px;">
+          <span style="color:var(--teal); font-size:18px;">✓</span> 6년 역사의 크루즈 전문 여행 동호회
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; color:rgba(238,244,255,.85); font-size:14px;">
+          <span style="color:var(--teal); font-size:18px;">✓</span> 지중해·카리브·동북아 등 다양한 코스 함께 출발
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; color:rgba(238,244,255,.85); font-size:14px;">
+          <span style="color:var(--teal); font-size:18px;">✓</span> 초보자도 안심! 경험 많은 멤버들과 동행
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; color:rgba(238,244,255,.85); font-size:14px;">
+          <span style="color:var(--teal); font-size:18px;">✓</span> 네이버 밴드에서 여행 후기·일정 실시간 공유
+        </div>
+      </div>
+      <a href="https://band.us/n/a2a0b9z6ja84g" target="_blank"
+        style="display:inline-flex; align-items:center; gap:10px; background:#00C73C; color:white; padding:16px 32px; border-radius:8px; font-weight:700; font-size:14px; letter-spacing:1px; text-decoration:none; transition:all .3s; box-shadow:0 8px 24px rgba(0,199,60,.3);"
+        onmouseover="this.style.background='#00a832'; this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.background='#00C73C'; this.style.transform='translateY(0)'">
+        <svg width="22" height="22" viewBox="0 0 36 36" fill="white"><rect width="36" height="36" rx="8" fill="white" fill-opacity="0"/><path d="M18 4C10.268 4 4 9.373 4 16c0 4.418 2.685 8.27 6.75 10.5L9 28l5.25-2.625C15.45 25.77 16.71 26 18 26c7.732 0 14-5.373 14-12S25.732 4 18 4z" fill="white"/></svg>
+        🟢 크루즈여행클럽 밴드 참여하기
+      </a>
+    </div>
+    <div class="reveal">
+      <div style="background:rgba(255,255,255,.05); border:1px solid rgba(0,212,184,.2); border-radius:20px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5);">
+        <div style="background:linear-gradient(135deg,#0a2a4a,#0d5090 60%,#00c9b1); height:200px; display:flex; align-items:center; justify-content:center; font-size:72px; position:relative;">
+          🚢
+          <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top, rgba(5,15,35,.9), transparent);"></div>
+        </div>
+        <div style="padding:28px;">
+          <div style="font-family:'Syne',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--teal); margin-bottom:10px;">크루즈여행클럽 · CRUISE TRAVEL CLUB</div>
+          <div style="font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--white); margin-bottom:8px;">함께 떠나는 바다 여행</div>
+          <div style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:20px;">
+            네이버 밴드에서 동호회 회원들과 크루즈 일정·후기·정보를 함께 나눠요. 초대 링크로 지금 바로 참여하세요!
+          </div>
+          <div style="background:rgba(0,212,184,.08); border:1px solid rgba(0,212,184,.2); border-radius:10px; padding:14px 16px; font-size:12px; color:rgba(238,244,255,.7); word-break:break-all; line-height:1.8;">
+            📎 band.us/n/a2a0b9z6ja84g
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-left reveal">
+      <div class="section-tag">Contact Us</div>
+      <h2 class="section-title">지금 바로<br><span class="accent">상담</span> 받으세요 <span class="en" style="font-size:.45em;vertical-align:middle;">Get Consultation</span></h2>
+      <p>궁금한 점이나 멤버십 가입 문의는 언제든지 연락 주세요. GLOBALTRIP 전문 컨설턴트가 최적의 플랜을 안내해 드립니다.<br><span class="en">Contact us anytime. Our consultants will guide you to the best plan.</span></p>
+      <div class="contact-infos">
+        <div class="ci2">
+          <span class="ci2-icon">📞</span>
+          <div class="ci2-text">
+            <span class="ci2-label">전화 상담 / Phone</span>
+            <a href="tel:01076871100" style="display:inline-block; margin-top:6px; background:var(--teal); color:var(--navy); padding:8px 20px; border-radius:6px; font-family:'Syne',sans-serif; font-weight:700; font-size:13px; text-decoration:none; letter-spacing:1px; transition:all .3s;"
+              onmouseover="this.style.background='#00f0d0'" onmouseout="this.style.background='var(--teal)'">
+              📞 전화걸기
+            </a>
+          </div>
+        </div>
+        <div class="ci2">
+          <span class="ci2-icon">🌐</span>
+          <div class="ci2-text">
+            <span class="ci2-label">Website</span>
+            <span class="ci2-val">www.globaltrip.incruises.com</span>
+          </div>
+        </div>
+        <div class="ci2">
+          <span class="ci2-icon">💬</span>
+          <div class="ci2-text">
+            <span class="ci2-label">카카오톡 상담</span>
+            <span class="ci2-val"><a href="https://open.kakao.com/o/sihbApgf" target="_blank" style="color:var(--teal);text-decoration:none;">카카오 오픈채팅 바로가기 →</a></span>
+          </div>
+        </div>
+        <div class="ci2">
+          <span class="ci2-icon">🌍</span>
+          <div class="ci2-text">
+            <span class="ci2-label">서비스 / Service</span>
+            <span class="ci2-val">190개국 한국어 지원 <span class="en">190 Countries</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-right reveal">
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>이름 / Name</label>
+            <input id="cf-name" type="text" placeholder="홍길동 / Full Name">
+          </div>
+          <div class="form-group">
+            <label>연락처 / Phone</label>
+            <input id="cf-phone" type="tel" placeholder="010-0000-0000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>이메일 / Email</label>
+          <input id="cf-email" type="email" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>관심 플랜 / Preferred Plan</label>
+          <select id="cf-plan">
+            <option value="">플랜을 선택해 주세요 / Select a Plan</option>
+            <option>Starter ($50/월 · per month)</option>
+            <option>Classic ($100/월 · per month) — 추천 Recommended</option>
+            <option>Premium ($250/월 · per month)</option>
+            <option>아직 결정 못함 / Not sure yet — 상담 원함</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>문의 내용 / Message</label>
+          <textarea id="cf-msg" placeholder="궁금하신 점을 자유롭게 적어주세요 / Feel free to ask anything..."></textarea>
+        </div>
+
+        <!-- 수신동의 -->
+        <div style="background:rgba(0,212,184,.05); border:1px solid rgba(0,212,184,.2); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:12px;">
+          <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+            <input type="checkbox" id="cf-req" style="width:17px;height:17px;accent-color:var(--teal);flex-shrink:0;margin-top:3px;">
+            <span style="font-size:12px; color:rgba(238,244,255,.8); line-height:1.6;">
+              <strong style="color:var(--teal);">[필수]</strong> 개인정보 수집·이용에 동의합니다.<br>
+              <span style="font-size:11px; color:var(--muted);">수집항목: 이름, 연락처 / 목적: 상담 안내 / 보유: 상담 종료 시까지</span>
+            </span>
+          </label>
+          <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+            <input type="checkbox" id="cf-ad" style="width:17px;height:17px;accent-color:var(--teal);flex-shrink:0;margin-top:3px;">
+            <span style="font-size:12px; color:rgba(238,244,255,.8); line-height:1.6;">
+              <strong style="color:rgba(0,212,184,.7);">[선택]</strong> 광고성 정보(이벤트·크루즈 특가 등) SMS 수신에 동의합니다.<br>
+              <span style="font-size:11px; color:var(--muted);">발신: GLOBALTRIP 010-7687-1100 / 수신거부: 무료거부 080-870-5383</span>
+            </span>
+          </label>
+          <div style="font-size:11px; color:var(--muted); border-top:1px solid rgba(0,212,184,.1); padding-top:10px; line-height:1.7;">
+            ※ 선택 동의는 거부하셔도 상담 신청이 가능합니다.<br>
+            ※ 수신동의는 언제든지 무료거부(<strong style="color:rgba(238,244,255,.6);">080-870-5383</strong>)로 철회 가능합니다.
+          </div>
+        </div>
+
+        <!-- 버튼 2개 -->
+        <button onclick="cruiseSendSMS()" style="background:var(--teal);color:var(--navy);padding:15px;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;width:100%;letter-spacing:1px;">
+          📱 문자로 상담 신청하기 / Send SMS
+        </button>
+        <button onclick="cruiseSendKakao()" style="background:#FEE500;color:#3A1D1D;padding:15px;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:1px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.6 5.1 4 6.6l-1 3.7 4.3-2.8c.9.2 1.8.3 2.7.3 5.523 0 10-3.477 10-7.8S17.523 3 12 3z"/></svg>
+          💬 카카오 오픈채팅으로 상담하기 / KakaoTalk
+        </button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.8;margin-top:4px;">
+          📱 문자 버튼: 문자앱이 열리고 내용 자동 입력 → 전송 한 번 더 눌러주세요<br>
+          💬 카톡 버튼: 입력 내용 클립보드 복사 → 카카오 오픈채팅으로 연결
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><em>GLOBAL</em>TRIP × inCruises</div>
+  <p>© 2026 GlobalTrip × inCruises. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">이용약관 <span class="en">Terms</span></a>
+    <a href="#">개인정보처리방침 <span class="en">Privacy</span></a>
+    <a href="#contact">문의하기 <span class="en">Contact</span></a>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a,button').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2)'; });
+    el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; });
+  });
+
+  // Particles
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const s = document.createElement('span');
+    const x = Math.random() * 100;
+    const dur = 8 + Math.random() * 14;
+    const delay = Math.random() * 10;
+    const dx = (Math.random() - 0.5) * 80;
+    s.style.cssText = `left:${x}%;animation-duration:${dur}s;animation-delay:-${delay}s;--dx:${dx}px;width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;`;
+    particlesEl.appendChild(s);
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.padding = window.scrollY > 60 ? '14px 60px' : '20px 60px';
+  });
+
+  // SMS 전송
+  function cruiseSendSMS() {
+    const name  = document.getElementById('cf-name').value.trim();
+    const phone = document.getElementById('cf-phone').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const plan  = document.getElementById('cf-plan').value;
+    const msg   = document.getElementById('cf-msg').value.trim();
+    const cReq  = document.getElementById('cf-req').checked;
+    const cAd   = document.getElementById('cf-ad').checked;
+    if (!name)  { alert('이름을 입력해 주세요.'); return; }
+    if (!phone) { alert('연락처를 입력해 주세요.'); return; }
+    if (!cReq)  { alert('[필수] 개인정보 수집·이용 동의를 체크해 주세요.'); return; }
+    const body = [
+      '[GLOBALTRIP inCruises 상담신청]',
+      '─────────────────',
+      '이름: ' + name,
+      '연락처: ' + phone,
+      email ? '이메일: ' + email : null,
+      plan  ? '관심플랜: ' + plan : null,
+      msg   ? '문의내용: ' + msg  : null,
+      '─────────────────',
+      '개인정보 수집동의: 동의함 (필수)',
+      'SMS 광고수신동의: ' + (cAd ? '동의함 ✅' : '미동의'),
+      '─────────────────',
+      'inCruises 멤버십 상담을 요청합니다.'
+    ].filter(Boolean).join('\n');
+    const enc = encodeURIComponent(body);
+    const ua = navigator.userAgent;
+    window.location.href = /iPhone|iPad|iPod/i.test(ua)
+      ? 'sms:01076871100&body=' + enc
+      : 'sms:01076871100?body=' + enc;
+  }
+
+  // 카카오 전송
+  function cruiseSendKakao() {
+    const name  = document.getElementById('cf-name').value.trim();
+    const phone = document.getElementById('cf-phone').value.trim();
+    const plan  = document.getElementById('cf-plan').value;
+    const msg   = document.getElementById('cf-msg').value.trim();
+    const cReq  = document.getElementById('cf-req').checked;
+    const cAd   = document.getElementById('cf-ad').checked;
+    if (!cReq) { alert('[필수] 개인정보 수집·이용 동의를 체크해 주세요.'); return; }
+    const content = [
+      '[GLOBALTRIP inCruises 상담신청]',
+      '이름: ' + (name || '(미입력)'),
+      '연락처: ' + (phone || '(미입력)'),
+      plan ? '관심플랜: ' + plan : null,
+      msg  ? '문의내용: ' + msg  : null,
+      '─────────────────',
+      '개인정보 수집동의: 동의함 (필수)',
+      'SMS 광고수신동의: ' + (cAd ? '동의함 ✅' : '미동의'),
+    ].filter(Boolean).join('\n');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(content).then(() => {
+        alert('📋 상담 내용이 클립보드에 복사되었습니다!\n카카오톡이 열리면 붙여넣기 후 전송해 주세요.');
+        window.open('https://open.kakao.com/o/sihbApgf', '_blank');
+      }).catch(() => window.open('https://open.kakao.com/o/sihbApgf', '_blank'));
+    } else {
+      window.open('https://open.kakao.com/o/sihbApgf', '_blank');
+    }
+  }
+</script>
+</body>
+</html>
